@@ -7,30 +7,34 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f0f2f5;
+            background-color: #000000;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            min-height: 100vh;
         }
 
         h1 {
             color: #6c5ce7;
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
         }
 
         .grid-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 15px;
             width: 100%;
             max-width: 400px;
         }
 
         .card {
-            background: white;
+            background: #1e1e1e;
             aspect-ratio: 1/1;
             display: flex;
             justify-content: center;
@@ -38,46 +42,84 @@
             font-size: 1.5rem;
             font-weight: bold;
             color: #6c5ce7;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(255,255,255,0.05);
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* الطبقة اللي بتظهر فوق */
+        /* المربع الكبير المميز تحت */
+        .special-card {
+            grid-column: span 4; /* بياخد العرض كله */
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            aspect-ratio: auto;
+            height: 80px;
+            margin-top: 20px;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card.visited {
+            opacity: 0.3;
+            transform: scale(0.9);
+            background: #333;
+        }
+
+        .card:active {
+            transform: scale(0.85);
+        }
+
         .overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(8px);
         }
 
         .modal {
-            background: white;
+            background: #fff;
             width: 85%;
+            max-width: 350px;
             padding: 30px;
-            border-radius: 20px;
+            border-radius: 25px;
             text-align: center;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .question-text {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: #333;
-            min-height: 50px;
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            color: #2d3436;
+            min-height: 60px;
+            line-height: 1.4;
         }
 
         .answer-text {
-            display: none; /* مخفية في الأول */
-            color: #27ae60;
+            display: none;
+            color: #d63031;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-bottom: 20px;
-            padding: 10px;
-            background: #f1f1f1;
-            border-radius: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border: 2px dashed #6c5ce7;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .btn {
@@ -86,14 +128,16 @@
             padding: 15px;
             margin-top: 10px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
 
         .btn-answer { background: #6c5ce7; color: white; }
         .btn-home { background: #dfe6e9; color: #2d3436; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -103,12 +147,16 @@
     <div class="grid-container" id="grid">
         </div>
 
+    <div class="grid-container" style="margin-top: 15px;">
+        <div class="card special-card" onclick="openSpecial()">Fazlooka</div>
+    </div>
+
     <div class="overlay" id="overlay">
         <div class="modal">
             <div class="question-text" id="qText"></div>
             <div class="answer-text" id="aText"></div>
             
-            <button class="btn btn-answer" onclick="showA()">الاجابه</button>
+            <button class="btn btn-answer" id="ansBtn" onclick="showA()">الاجابه</button>
             <button class="btn btn-home" onclick="closeM()">Home</button>
         </div>
     </div>
@@ -141,27 +189,37 @@
         const overlay = document.getElementById('overlay');
         const qText = document.getElementById('qText');
         const aText = document.getElementById('aText');
+        const ansBtn = document.getElementById('ansBtn');
 
-        // رسم المربعات
         questions.forEach((item, i) => {
             const box = document.createElement('div');
             box.className = 'card';
             box.innerText = i + 1;
-            box.onclick = () => {
+            box.onclick = function() {
+                this.classList.add('visited');
+                ansBtn.style.display = 'block'; // تأكيد ظهور الزرار للمربعات العادية
                 qText.innerText = item.q;
                 aText.innerText = item.a;
-                aText.style.display = 'none'; // خبي الإجابة أول ما يفتح
+                aText.style.display = 'none';
                 overlay.style.display = 'flex';
             };
             grid.appendChild(box);
         });
 
+        // وظيفة المربع الكبير
+        function openSpecial() {
+            qText.innerText = "أسرع حد يجيبلي شراب أسود عندي هنا! 🧦";
+            aText.style.display = 'none';
+            ansBtn.style.display = 'none'; // إخفاء زرار الإجابة
+            overlay.style.display = 'flex';
+        }
+
         function showA() {
-            aText.style.display = 'block'; // أظهر الإجابة
+            aText.style.display = 'block';
         }
 
         function closeM() {
-            overlay.style.display = 'none'; // إقفل وارجع Home
+            overlay.style.display = 'none';
         }
     </script>
 </body>
