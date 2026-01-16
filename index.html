@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +14,8 @@
             align-items: center;
             padding: 20px;
             min-height: 100vh;
+            /* للتأكيد على اتجاه النصوص العربية داخل الصناديق */
+            text-align: center;
         }
 
         h1 {
@@ -48,9 +50,8 @@
             transition: all 0.3s ease;
         }
 
-        /* المربع الكبير المميز تحت */
         .special-card {
-            grid-column: span 4; /* بياخد العرض كله */
+            grid-column: span 4;
             background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             color: white;
             aspect-ratio: auto;
@@ -89,6 +90,8 @@
             border-radius: 25px;
             text-align: center;
             animation: slideUp 0.4s ease-out;
+            /* لضمان بقاء السؤال العربي في النص حتى مع قلب الاتجاه */
+            direction: rtl; 
         }
 
         @keyframes slideUp {
@@ -144,8 +147,7 @@
 
     <h1>Fazlooka</h1>
 
-    <div class="grid-container" id="grid">
-        </div>
+    <div class="grid-container" id="grid"></div>
 
     <div class="grid-container" style="margin-top: 15px;">
         <div class="card special-card" onclick="openSpecial()">Fazlooka</div>
@@ -169,13 +171,13 @@
             {q: "خد سيلفى مع فريقك", a: "📸 مبروك الصورة"},
             {q: "اقعد ساكت لمده عشرين ثانيه", a: "🤫 شششش"},
             {q: "مين آخر فريق فاز باليورباليج؟", a: "توتنهام"},
-            {q: "نسبه المياه العذبه اللي نقدر نستخدمها كام ف الميه؟", a: "١٪؜"},
+            {q: "نسبه المياه العذبه اللي نقدر نستخدمها كام ف الميه؟", a: "1%"},
             {q: "فكرني باسم فريقك كده", a: "أجدع فريق"},
             {q: "اوعى تسكت لمده 15 ثانيه", a: "رغي بفايدة"},
             {q: "ايه هي رتب الشماس ف الكنيسه؟", a: "إبصالتس - أغنسطس - إيبودياكون - دياكون - أرشيدياكون"},
             {q: "نتيجه ماتش الكلاسيكو الاخير كانت كام؟", a: "2-3"},
             {q: "ما هي بلد المليون شهيد؟", a: "الجزائر"},
-            {q: "عدد رسايل بولس ناقص عدد رسايل الكاثوليكون كام؟", a: "٧"},
+            {q: "عدد رسايل بولس ناقص عدد رسايل الكاثوليكون كام؟", a: "7"},
             {q: "مين كسب اول كاس عالم؟", a: "اوروغواي"},
             {q: "اقولي نكته لو مضحكتش تخسر 😂", a: "ها ها ها"},
             {q: "قولي تلت اسماء ثلاثيه من الفريق اللي بعدك", a: "ركز يا بطل"},
@@ -194,10 +196,11 @@
         questions.forEach((item, i) => {
             const box = document.createElement('div');
             box.className = 'card';
+            // الأرقام ستظهر تلقائياً بالصيغة الإنجليزية بسبب dir="ltr"
             box.innerText = i + 1;
             box.onclick = function() {
                 this.classList.add('visited');
-                ansBtn.style.display = 'block'; // تأكيد ظهور الزرار للمربعات العادية
+                ansBtn.style.display = 'block';
                 qText.innerText = item.q;
                 aText.innerText = item.a;
                 aText.style.display = 'none';
@@ -206,11 +209,10 @@
             grid.appendChild(box);
         });
 
-        // وظيفة المربع الكبير
         function openSpecial() {
             qText.innerText = "أسرع حد يجيبلي شراب أسود عندي هنا! 🧦";
             aText.style.display = 'none';
-            ansBtn.style.display = 'none'; // إخفاء زرار الإجابة
+            ansBtn.style.display = 'none';
             overlay.style.display = 'flex';
         }
 
