@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazlooka</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #6c5ce7;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .card {
+            background: white;
+            aspect-ratio: 1/1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #6c5ce7;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        /* الطبقة اللي بتظهر فوق */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background: white;
+            width: 85%;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #333;
+            min-height: 50px;
+        }
+
+        .answer-text {
+            display: none; /* مخفية في الأول */
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-answer { background: #6c5ce7; color: white; }
+        .btn-home { background: #dfe6e9; color: #2d3436; }
+    </style>
+</head>
+<body>
+
+    <h1>Fazlooka</h1>
+
+    <div class="grid-container" id="grid">
+        </div>
+
+    <div class="overlay" id="overlay">
+        <div class="modal">
+            <div class="question-text" id="qText"></div>
+            <div class="answer-text" id="aText"></div>
+            
+            <button class="btn btn-answer" onclick="showA()">الاجابه</button>
+            <button class="btn btn-home" onclick="closeM()">Home</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {q: "ناقص نقطه وتروح للفريق اللي بعدك 😊", a: "خسرت نقطة!"},
+            {q: "مصر واجهه مين ف دور ١٦؟", a: "بنين"},
+            {q: "ايه المدينه اللي اتولد فيها بولس الرسول؟", a: "طرسوس"},
+            {q: "خد سيلفى مع فريقك", a: "📸 مبروك الصورة"},
+            {q: "اقعد ساكت لمده عشرين ثانيه", a: "🤫 شششش"},
+            {q: "مين آخر فريق فاز باليورباليج؟", a: "توتنهام"},
+            {q: "نسبه المياه العذبه اللي نقدر نستخدمها كام ف الميه؟", a: "١٪؜"},
+            {q: "فكرني باسم فريقك كده", a: "أجدع فريق"},
+            {q: "اوعى تسكت لمده 15 ثانيه", a: "رغي بفايدة"},
+            {q: "ايه هي رتب الشماس ف الكنيسه؟", a: "إبصالتس - أغنسطس - إيبودياكون - دياكون - أرشيدياكون"},
+            {q: "نتيجه ماتش الكلاسيكو الاخير كانت كام؟", a: "2-3"},
+            {q: "ما هي بلد المليون شهيد؟", a: "الجزائر"},
+            {q: "عدد رسايل بولس ناقص عدد رسايل الكاثوليكون كام؟", a: "٧"},
+            {q: "مين كسب اول كاس عالم؟", a: "اوروغواي"},
+            {q: "اقولي نكته لو مضحكتش تخسر 😂", a: "ها ها ها"},
+            {q: "قولي تلت اسماء ثلاثيه من الفريق اللي بعدك", a: "ركز يا بطل"},
+            {q: "بونص نقطه 😉", a: "+1"},
+            {q: "خد نقطه", a: "+1 مبروك"},
+            {q: "حيوان يمتلك اقوى ذاكره", a: "الفيل"},
+            {q: "ناقص نقطه 😥", a: "حظ أوفر"}
+        ];
+
+        const grid = document.getElementById('grid');
+        const overlay = document.getElementById('overlay');
+        const qText = document.getElementById('qText');
+        const aText = document.getElementById('aText');
+
+        // رسم المربعات
+        questions.forEach((item, i) => {
+            const box = document.createElement('div');
+            box.className = 'card';
+            box.innerText = i + 1;
+            box.onclick = () => {
+                qText.innerText = item.q;
+                aText.innerText = item.a;
+                aText.style.display = 'none'; // خبي الإجابة أول ما يفتح
+                overlay.style.display = 'flex';
+            };
+            grid.appendChild(box);
+        });
+
+        function showA() {
+            aText.style.display = 'block'; // أظهر الإجابة
+        }
+
+        function closeM() {
+            overlay.style.display = 'none'; // إقفل وارجع Home
+        }
+    </script>
+</body>
+</html>
